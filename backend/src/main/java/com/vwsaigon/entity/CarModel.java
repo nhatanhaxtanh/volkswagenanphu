@@ -40,6 +40,7 @@ public class CarModel {
     private String fuelType;
     private String transmission;
     private String imageUrl;
+    private String videoUrl;
 
     @ElementCollection
     @CollectionTable(name = "car_model_images", joinColumns = @JoinColumn(name = "car_model_id"))

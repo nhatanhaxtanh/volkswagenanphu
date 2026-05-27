@@ -51,6 +51,7 @@ public class CarModelService {
         existing.setFuelType(updated.getFuelType());
         existing.setTransmission(updated.getTransmission());
         existing.setImageUrl(updated.getImageUrl());
+        existing.setVideoUrl(updated.getVideoUrl());
         existing.setFeatured(updated.isFeatured());
         existing.setActive(updated.isActive());
         return repository.save(existing);

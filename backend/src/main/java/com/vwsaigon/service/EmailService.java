@@ -106,7 +106,7 @@ public class EmailService {
                       <p style="margin: 4px 0;"><strong>Giờ:</strong> %s</p>
                     </div>
                     <p style="color: #555;">Chuyên viên tư vấn sẽ liên hệ với bạn trong vòng <strong>24 giờ</strong> để xác nhận lịch hẹn.</p>
-                    <p style="color: #555;">Nếu cần hỗ trợ gấp, vui lòng gọi: <strong><a href="tel:0764949837">076 4949 837</a></strong></p>
+                    <p style="color: #555;">Nếu cần hỗ trợ gấp, vui lòng gọi: <strong><a href="tel:0981058232">098 105 8232</a></strong></p>
                     <p style="color: #888; font-size: 13px; margin-top: 24px;">Volkswagen An Phú — 507C Võ Nguyên Giáp, An Khánh, Thủ Đức, TP.HCM</p>
                   </div>
                 </div>

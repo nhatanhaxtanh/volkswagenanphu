@@ -27,9 +27,10 @@ public class TestDriveService {
                 modelId = Long.parseLong(dto.getModelId());
                 modelName = carModelRepository.findById(modelId)
                         .map(CarModel::getName)
-                        .orElse(null);
+                        .orElse(dto.getModelName());
             } catch (NumberFormatException ignored) {}
         }
+        if (modelName == null) modelName = dto.getModelName();
 
         TestDriveRequest request = TestDriveRequest.builder()
                 .fullName(dto.getFullName())

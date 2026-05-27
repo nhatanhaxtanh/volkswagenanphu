@@ -23,5 +23,6 @@ public class TestDriveDto {
     private String preferredTime;
 
     private String modelId;
+    private String modelName;
     private String notes;
 }

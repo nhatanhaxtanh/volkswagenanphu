@@ -13,11 +13,11 @@ public class AdminUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return adminRepository.findByUsername(username)
-                .map(admin -> User.withUsername(admin.getUsername())
-                        .password(admin.getPasswordHash())
-                        .roles("ADMIN")
-                        .build())
+        var admin = adminRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Admin not found: " + username));
+        return User.withUsername(admin.getUsername())
+                .password(admin.getPasswordHash())
+                .roles("ADMIN")
+                .build();
     }
 }

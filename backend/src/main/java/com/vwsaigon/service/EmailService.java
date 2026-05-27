@@ -29,7 +29,7 @@ public class EmailService {
             var helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(fromEmail);
             helper.setTo(notificationEmail);
-            helper.setSubject("[VW Sài Gòn] Đăng ký lái thử mới - " + request.getFullName());
+            helper.setSubject("[VW An Phú] Đăng ký lái thử mới - " + request.getFullName());
             helper.setText(buildNotificationHtml(request), true);
             mailSender.send(message);
             log.info("Test drive notification sent for: {}", request.getFullName());
@@ -46,7 +46,7 @@ public class EmailService {
             var helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(fromEmail);
             helper.setTo(request.getEmail());
-            helper.setSubject("[Volkswagen Sài Gòn] Xác nhận đăng ký lái thử");
+            helper.setSubject("[Volkswagen An Phú] Xác nhận đăng ký lái thử");
             helper.setText(buildConfirmationHtml(request), true);
             mailSender.send(message);
         } catch (Exception e) {
@@ -58,7 +58,7 @@ public class EmailService {
         return """
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                   <div style="background: #000; padding: 20px; text-align: center;">
-                    <h1 style="color: #fff; font-size: 18px; margin: 0; letter-spacing: 3px;">VW SÀI GÒN</h1>
+                    <h1 style="color: #fff; font-size: 18px; margin: 0; letter-spacing: 3px;">VW AN PHÚ</h1>
                   </div>
                   <div style="padding: 30px; border: 1px solid #e5e5e5;">
                     <h2 style="color: #000; margin-top: 0;">Đăng ký lái thử mới</h2>
@@ -94,7 +94,7 @@ public class EmailService {
         return """
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                   <div style="background: #000; padding: 20px; text-align: center;">
-                    <h1 style="color: #fff; font-size: 18px; margin: 0; letter-spacing: 3px;">VW SÀI GÒN</h1>
+                    <h1 style="color: #fff; font-size: 18px; margin: 0; letter-spacing: 3px;">VW AN PHÚ</h1>
                   </div>
                   <div style="padding: 30px; border: 1px solid #e5e5e5;">
                     <h2 style="color: #000; margin-top: 0;">Đăng ký lái thử thành công!</h2>
@@ -107,7 +107,7 @@ public class EmailService {
                     </div>
                     <p style="color: #555;">Chuyên viên tư vấn sẽ liên hệ với bạn trong vòng <strong>24 giờ</strong> để xác nhận lịch hẹn.</p>
                     <p style="color: #555;">Nếu cần hỗ trợ gấp, vui lòng gọi: <strong><a href="tel:0764949837">076 4949 837</a></strong></p>
-                    <p style="color: #888; font-size: 13px; margin-top: 24px;">Volkswagen Sài Gòn — 507C Võ Nguyên Giáp, An Khánh, Thủ Đức, TP.HCM</p>
+                    <p style="color: #888; font-size: 13px; margin-top: 24px;">Volkswagen An Phú — 507C Võ Nguyên Giáp, An Khánh, Thủ Đức, TP.HCM</p>
                   </div>
                 </div>
                 """.formatted(

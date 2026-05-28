@@ -111,21 +111,21 @@ public class DataInitializer implements CommandLineRunner {
                     .price(2899000000L).priceDisplay("2.899.000.000")
                     .shortDescription("SUV flagship phiên bản Elegance tinh tế, kết hợp sang trọng và công nghệ.")
                     .description("Touareg Elegance mang ngôn ngữ thiết kế thanh lịch với Innovision Cockpit màn hình cong 15 inch. Ngoại thất mâm 19 inch chrome, lưới tản nhiệt mạ bạc và đèn LED matrix tinh tế.\n\nHệ thống treo khí 4 cấp, động cơ V6 TDI 3.0L mạnh mẽ và dẫn động 4Motion. Air suspension cho phép thay đổi độ cao gầm theo địa hình.")
-                    .engine("3.0L V6 TDI").power("231 mã lực").torque("500 Nm").seats(5).fuelType("Diesel").transmission("Tiptronic 8 cấp")
+                    .engine("3.0L V6 TDI").power("231 mã lực").torque("500 Nm").seats(5).fuelType("Xăng").transmission("Tiptronic 8 cấp")
                     .videoUrl("do_O-fuB-RE").featured(true).active(true).build(),
 
                 CarModel.builder().name("Touareg R-Line").slug("touareg-rline").category("SUV")
                     .price(2999000000L).priceDisplay("2.999.000.000")
                     .shortDescription("SUV flagship phiên bản R-Line thể thao mạnh mẽ, cá tính vượt trội.")
                     .description("Touareg R-Line mang phong cách thể thao với body kit R-Line đặc trưng, mâm 20 inch đen bóng và hệ thống xả thể thao đôi. Nội thất sport với đường chỉ khâu màu đỏ và vô lăng thể thao.\n\n5 chế độ lái từ Eco đến Off-road, hệ thống treo khí và dẫn động 4Motion AWD toàn thời gian.")
-                    .engine("3.0L V6 TDI").power("231 mã lực").torque("500 Nm").seats(5).fuelType("Diesel").transmission("Tiptronic 8 cấp")
+                    .engine("3.0L V6 TDI").power("231 mã lực").torque("500 Nm").seats(5).fuelType("Xăng").transmission("Tiptronic 8 cấp")
                     .videoUrl("uJoRgj_b8ZY").featured(false).active(true).build(),
 
                 CarModel.builder().name("Touareg Highline").slug("touareg-highline").category("SUV")
                     .price(3499000000L).priceDisplay("3.499.000.000")
                     .shortDescription("SUV flagship phiên bản Highline — tích hợp mọi công nghệ đỉnh cao nhất.")
                     .description("Touareg Highline là phiên bản tối thượng, tích hợp toàn bộ công nghệ cao cấp nhất của Volkswagen. Head-up Display thực tế tăng cường AR, ghế massage 10 điểm và thông gió chủ động.\n\nNight Vision, Bose Surround 14 loa, da Nappa toàn bộ và ốp gỗ thực. Mâm 21 inch và cản thể thao tạo nên tổng thể đẳng cấp tối thượng.")
-                    .engine("3.0L V6 TDI").power("231 mã lực").torque("500 Nm").seats(5).fuelType("Diesel").transmission("Tiptronic 8 cấp")
+                    .engine("3.0L V6 TDI").power("231 mã lực").torque("500 Nm").seats(5).fuelType("Xăng").transmission("Tiptronic 8 cấp")
                     .videoUrl("83qH1PkYUVo").featured(false).active(true).build()
             );
             carModelRepository.saveAll(models);

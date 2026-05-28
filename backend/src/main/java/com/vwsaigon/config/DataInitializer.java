@@ -3,10 +3,12 @@ package com.vwsaigon.config;
 import com.vwsaigon.entity.Admin;
 import com.vwsaigon.entity.CarModel;
 import com.vwsaigon.entity.CarPromotion;
+import com.vwsaigon.entity.HeroSlide;
 import com.vwsaigon.entity.NewsPost;
 import com.vwsaigon.repository.AdminRepository;
 import com.vwsaigon.repository.CarModelRepository;
 import com.vwsaigon.repository.CarPromotionRepository;
+import com.vwsaigon.repository.HeroSlideRepository;
 import com.vwsaigon.repository.NewsPostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,7 @@ public class DataInitializer implements CommandLineRunner {
     private final CarModelRepository carModelRepository;
     private final NewsPostRepository newsPostRepository;
     private final CarPromotionRepository carPromotionRepository;
+    private final HeroSlideRepository heroSlideRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.admin.username:admin}")
@@ -378,6 +381,16 @@ public class DataInitializer implements CommandLineRunner {
             }
             carPromotionRepository.saveAll(promotions);
             log.info("Seeded {} car promotions", promotions.size());
+        }
+
+        if (heroSlideRepository.count() == 0) {
+            heroSlideRepository.saveAll(List.of(
+                HeroSlide.builder().label("Volkswagen Touareg").heading("Flagship SUV.").sub("Đỉnh cao sang trọng.").description("Sức mạnh, công nghệ và thiết kế hội tụ trên một mẫu xe duy nhất.").videoUrl("/images/vid3.mp4").sortOrder(0).active(true).build(),
+                HeroSlide.builder().label("Đại lý 4S Flagship lớn nhất Top 1 TP. Hồ Chí Minh").heading("Das Auto.").sub("Trải nghiệm đẳng cấp.").description("Khám phá bộ sưu tập xe Volkswagen chính hãng tại TP. Hồ Chí Minh.").imageUrl("/images/hero.jpg").sortOrder(1).active(true).build(),
+                HeroSlide.builder().label("Volkswagen Tiguan").heading("Urban Explorer.").sub("Chinh phục mọi hành trình.").description("SUV đô thị thông minh, trang bị công nghệ an toàn tiên tiến.").imageUrl("/images/hero5.jpg").sortOrder(2).active(true).build(),
+                HeroSlide.builder().label("Volkswagen Teramont").heading("Family King.").sub("Không gian, sức mạnh, đẳng cấp.").description("SUV 7 chỗ rộng rãi, hoàn hảo cho gia đình hiện đại.").imageUrl("/images/hero6.jpg").sortOrder(3).active(true).build()
+            ));
+            log.info("Seeded 4 hero slides");
         }
     }
 }

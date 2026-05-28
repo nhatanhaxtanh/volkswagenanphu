@@ -28,6 +28,8 @@ services:
       APP_MAIL_NOTIFICATION_TO: ${NOTIFICATION_EMAIL}
       APP_ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       APP_ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin@2024!}
+    volumes:
+      - uploads_data:/app/uploads
     networks:
       - vw_network
 
@@ -61,6 +63,7 @@ services:
 
 volumes:
   postgres_data:
+  uploads_data:
 
 networks:
   vw_network:

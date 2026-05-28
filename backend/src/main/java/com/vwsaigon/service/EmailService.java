@@ -23,6 +23,41 @@ public class EmailService {
     private String fromEmail;
 
     @Async
+    public void sendContactNotification(String fullName, String phone, String email, String message) {
+        try {
+            var msg = mailSender.createMimeMessage();
+            var helper = new MimeMessageHelper(msg, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(notificationEmail);
+            helper.setSubject("[VW An Phú] Tin nhắn liên hệ mới - " + fullName);
+            helper.setText("""
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                  <div style="background: #000; padding: 20px; text-align: center;">
+                    <h1 style="color: #fff; font-size: 18px; margin: 0; letter-spacing: 3px;">VW AN PHÚ</h1>
+                  </div>
+                  <div style="padding: 30px; border: 1px solid #e5e5e5;">
+                    <h2 style="color: #000; margin-top: 0;">Tin nhắn liên hệ mới</h2>
+                    <table style="width: 100%%; border-collapse: collapse;">
+                      <tr><td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; color: #666; width: 140px;">Họ tên</td>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-weight: bold;">%s</td></tr>
+                      <tr><td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; color: #666;">Điện thoại</td>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><a href="tel:%s">%s</a></td></tr>
+                      <tr><td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; color: #666;">Email</td>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">%s</td></tr>
+                      <tr><td style="padding: 8px 0; color: #666; vertical-align: top;">Nội dung</td>
+                          <td style="padding: 8px 0;">%s</td></tr>
+                    </table>
+                  </div>
+                </div>
+                """.formatted(fullName, phone, phone, email != null ? email : "—", message), true);
+            mailSender.send(msg);
+            log.info("Contact notification sent from: {}", fullName);
+        } catch (Exception e) {
+            log.error("Failed to send contact email", e);
+        }
+    }
+
+    @Async
     public void sendTestDriveNotification(TestDriveRequest request) {
         try {
             var message = mailSender.createMimeMessage();

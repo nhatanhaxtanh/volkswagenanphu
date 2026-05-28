@@ -2,9 +2,11 @@ package com.vwsaigon.controller;
 
 import com.vwsaigon.entity.CarModel;
 import com.vwsaigon.service.CarModelService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -58,5 +60,18 @@ public class CarModelController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/api/admin/models/{id}/thumbnail")
+    public ResponseEntity<CarModel> uploadThumbnail(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request) {
+        String scheme = request.getHeader("X-Forwarded-Proto") != null
+                ? request.getHeader("X-Forwarded-Proto") : request.getScheme();
+        String host = request.getHeader("Host") != null
+                ? request.getHeader("Host") : request.getServerName() + (request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "");
+        String baseUrl = scheme + "://" + host;
+        return ResponseEntity.ok(service.uploadThumbnail(id, file, baseUrl));
     }
 }

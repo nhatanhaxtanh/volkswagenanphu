@@ -16,10 +16,8 @@ public class TestDriveDto {
 
     private String email;
 
-    @NotBlank(message = "Ngày lái thử không được trống")
     private String preferredDate;
 
-    @NotBlank(message = "Giờ lái thử không được trống")
     private String preferredTime;
 
     private String modelId;

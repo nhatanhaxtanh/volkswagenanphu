@@ -118,10 +118,11 @@ public class EmailService {
                 </div>
                 """.formatted(
                 r.getFullName(), r.getPhone(), r.getPhone(),
-                r.getEmail() != null ? r.getEmail() : "—",
+                r.getEmail() != null && !r.getEmail().isBlank() ? r.getEmail() : "—",
                 r.getModelName() != null ? r.getModelName() : "Chưa chọn",
-                r.getPreferredDate(), r.getPreferredTime(),
-                r.getNotes() != null ? r.getNotes() : "—"
+                r.getPreferredDate() != null && !r.getPreferredDate().isBlank() ? r.getPreferredDate() : "Chuyên viên xác nhận",
+                r.getPreferredTime() != null && !r.getPreferredTime().isBlank() ? r.getPreferredTime() : "—",
+                r.getNotes() != null && !r.getNotes().isBlank() ? r.getNotes() : "—"
         );
     }
 
@@ -148,7 +149,8 @@ public class EmailService {
                 """.formatted(
                 r.getFullName(),
                 r.getModelName() != null ? r.getModelName() : "Chưa chọn",
-                r.getPreferredDate(), r.getPreferredTime()
+                r.getPreferredDate() != null && !r.getPreferredDate().isBlank() ? r.getPreferredDate() : "Chuyên viên sẽ liên hệ xác nhận",
+                r.getPreferredTime() != null && !r.getPreferredTime().isBlank() ? r.getPreferredTime() : "—"
         );
     }
 }

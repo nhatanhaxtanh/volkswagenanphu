@@ -5,6 +5,9 @@ import com.vwsaigon.service.NewsPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -51,5 +54,18 @@ public class NewsController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/api/admin/news/{id}/image")
+    public ResponseEntity<NewsPost> uploadImage(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request) {
+        String proto = request.getHeader("X-Forwarded-Proto");
+        String host = request.getHeader("Host");
+        if (proto == null) proto = request.getScheme();
+        if (host == null) host = request.getServerName() + (request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "");
+        String baseUrl = proto + "://" + host;
+        return ResponseEntity.ok(service.uploadImage(id, file, baseUrl));
     }
 }

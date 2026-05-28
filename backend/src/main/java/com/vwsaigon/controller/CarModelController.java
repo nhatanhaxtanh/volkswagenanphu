@@ -74,4 +74,24 @@ public class CarModelController {
         String baseUrl = scheme + "://" + host;
         return ResponseEntity.ok(service.uploadThumbnail(id, file, baseUrl));
     }
+
+    @PostMapping("/api/admin/models/{id}/images")
+    public ResponseEntity<CarModel> addGalleryImage(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request) {
+        String scheme = request.getHeader("X-Forwarded-Proto") != null
+                ? request.getHeader("X-Forwarded-Proto") : request.getScheme();
+        String host = request.getHeader("Host") != null
+                ? request.getHeader("Host") : request.getServerName() +
+                  (request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "");
+        return ResponseEntity.ok(service.addGalleryImage(id, file, scheme + "://" + host));
+    }
+
+    @DeleteMapping("/api/admin/models/{id}/images")
+    public ResponseEntity<CarModel> removeGalleryImage(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, String> body) {
+        return ResponseEntity.ok(service.removeGalleryImage(id, body.get("url")));
+    }
 }

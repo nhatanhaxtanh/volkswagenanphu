@@ -90,4 +90,33 @@ public class CarModelService {
             throw new RuntimeException("Failed to store file", e);
         }
     }
+
+    public CarModel addGalleryImage(Long id, MultipartFile file, String baseUrl) {
+        CarModel model = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Car model not found: " + id));
+        String original = file.getOriginalFilename() != null ? file.getOriginalFilename() : "image.jpg";
+        String ext = original.contains(".") ? original.substring(original.lastIndexOf('.')).toLowerCase() : ".jpg";
+        if (!java.util.List.of(".jpg", ".jpeg", ".png", ".webp").contains(ext))
+            throw new RuntimeException("Invalid file type");
+        if (file.getSize() > 2L * 1024 * 1024)
+            throw new RuntimeException("File size exceeds 2MB limit");
+        try {
+            java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir, "gallery");
+            java.nio.file.Files.createDirectories(uploadPath);
+            String filename = java.util.UUID.randomUUID() + ext;
+            java.nio.file.Files.copy(file.getInputStream(), uploadPath.resolve(filename), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            if (model.getImages() == null) model.setImages(new java.util.ArrayList<>());
+            model.getImages().add(baseUrl + "/api/uploads/gallery/" + filename);
+            return repository.save(model);
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Failed to store file", e);
+        }
+    }
+
+    public CarModel removeGalleryImage(Long id, String imageUrl) {
+        CarModel model = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Car model not found: " + id));
+        if (model.getImages() != null) model.getImages().remove(imageUrl);
+        return repository.save(model);
+    }
 }

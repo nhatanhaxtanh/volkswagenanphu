@@ -71,8 +71,7 @@ public class CarModelController {
                 ? request.getHeader("X-Forwarded-Proto") : request.getScheme();
         String host = request.getHeader("Host") != null
                 ? request.getHeader("Host") : request.getServerName() + (request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "");
-        String baseUrl = scheme + "://" + host;
-        return ResponseEntity.ok(service.uploadThumbnail(id, file, baseUrl));
+        return ResponseEntity.ok(service.uploadThumbnail(id, file, scheme + "://" + host));
     }
 
     @PostMapping("/api/admin/models/{id}/images")

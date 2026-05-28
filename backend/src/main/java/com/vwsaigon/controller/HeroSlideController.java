@@ -58,8 +58,7 @@ public class HeroSlideController {
         String host = request.getHeader("Host") != null
                 ? request.getHeader("Host") : request.getServerName() +
                   (request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "");
-        String baseUrl = scheme + "://" + host;
-        return ResponseEntity.ok(service.uploadImage(id, file, baseUrl));
+        return ResponseEntity.ok(service.uploadImage(id, file, scheme + "://" + host));
     }
 
     @PostMapping("/api/admin/hero-slides/{id}/video")
@@ -72,7 +71,6 @@ public class HeroSlideController {
         String host = request.getHeader("Host") != null
                 ? request.getHeader("Host") : request.getServerName() +
                   (request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "");
-        String baseUrl = scheme + "://" + host;
-        return ResponseEntity.ok(service.uploadVideo(id, file, baseUrl));
+        return ResponseEntity.ok(service.uploadVideo(id, file, scheme + "://" + host));
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ public class DataInitializer implements CommandLineRunner {
     private String defaultPassword;
 
     @Override
+    @Transactional
     public void run(String... args) {
         if (adminRepository.count() == 0) {
             Admin admin = Admin.builder()

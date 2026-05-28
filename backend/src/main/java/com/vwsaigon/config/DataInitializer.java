@@ -2,9 +2,11 @@ package com.vwsaigon.config;
 
 import com.vwsaigon.entity.Admin;
 import com.vwsaigon.entity.CarModel;
+import com.vwsaigon.entity.CarPromotion;
 import com.vwsaigon.entity.NewsPost;
 import com.vwsaigon.repository.AdminRepository;
 import com.vwsaigon.repository.CarModelRepository;
+import com.vwsaigon.repository.CarPromotionRepository;
 import com.vwsaigon.repository.NewsPostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +15,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +28,7 @@ public class DataInitializer implements CommandLineRunner {
     private final AdminRepository adminRepository;
     private final CarModelRepository carModelRepository;
     private final NewsPostRepository newsPostRepository;
+    private final CarPromotionRepository carPromotionRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.admin.username:admin}")
@@ -166,6 +172,210 @@ public class DataInitializer implements CommandLineRunner {
             );
             newsPostRepository.saveAll(posts);
             log.info("Seeded {} news posts", posts.size());
+        }
+
+        // --- Gallery image seeding ---
+        Map<String, String> galleryMap = new HashMap<>();
+        galleryMap.put("tiguan-facelift",      "/images/models/tiguanfacelit.jpg");
+        galleryMap.put("teramont-usa-base",    "/images/models/usa.jpeg");
+        galleryMap.put("teramont-usa-limited", "/images/models/limited.PNG");
+        galleryMap.put("teramont-president",   "/images/models/teramontpresident.jpg");
+        galleryMap.put("teramont-x-platinum",  "/images/models/teramontxplatinum.jpg");
+        galleryMap.put("viloran-premium",      "/images/models/viloranpremium.jpg");
+        galleryMap.put("viloran-luxury",       "/images/models/viloranluxury.jpg");
+        galleryMap.put("golf-15-etsi",         "/images/models/golf15.jpg");
+        galleryMap.put("golf-20",              "/images/models/Golf20.jpg");
+        galleryMap.put("touareg-elegance",     "/images/models/TouaregElegance.jpg");
+        galleryMap.put("touareg-rline",        "/images/models/TouaregRline.jpeg");
+        galleryMap.put("touareg-highline",     "/images/models/TouaregHighline.jpg");
+
+        List<CarModel> allModels = carModelRepository.findAll();
+        List<CarModel> modelsToUpdate = new ArrayList<>();
+        for (CarModel model : allModels) {
+            if (model.getImages() == null || model.getImages().isEmpty()) {
+                String imagePath = galleryMap.get(model.getSlug());
+                if (imagePath != null) {
+                    List<String> images = new ArrayList<>();
+                    images.add(imagePath);
+                    model.setImages(images);
+                    modelsToUpdate.add(model);
+                }
+            }
+        }
+        if (!modelsToUpdate.isEmpty()) {
+            carModelRepository.saveAll(modelsToUpdate);
+            log.info("Seeded gallery images for {} car models", modelsToUpdate.size());
+        }
+
+        // --- Promotion seeding ---
+        if (carPromotionRepository.count() == 0) {
+            Map<String, CarPromotion.CarPromotionBuilder> promotionMap = new HashMap<>();
+
+            promotionMap.put("tiguan-facelift", CarPromotion.builder()
+                .title("Ưu đãi đặc biệt — Tiguan Facelift")
+                .description("Cơ hội sở hữu Tiguan Facelift với ưu đãi hấp dẫn. Liên hệ ngay để nhận tư vấn chi tiết.")
+                .items(List.of(
+                    "Giảm ngay 30 triệu tiền mặt",
+                    "Tặng bảo hiểm thân vỏ 1 năm trị giá 15 triệu",
+                    "Gói phụ kiện chính hãng 10 triệu",
+                    "Hỗ trợ vay 0% lãi suất 12 tháng đầu"
+                ))
+                .validUntil("30/06/2026")
+                .active(true));
+
+            promotionMap.put("teramont-usa-base", CarPromotion.builder()
+                .title("Ưu đãi — Teramont USA Base")
+                .description("Sở hữu SUV 7 chỗ nhập Mỹ với chính sách ưu đãi tốt nhất trong năm.")
+                .items(List.of(
+                    "Giảm 50 triệu tiền mặt",
+                    "Tặng bảo hiểm thân vỏ 1 năm",
+                    "Camera hành trình cao cấp",
+                    "Hỗ trợ vay lãi suất ưu đãi"
+                ))
+                .validUntil("30/06/2026")
+                .active(true));
+
+            promotionMap.put("teramont-usa-limited", CarPromotion.builder()
+                .title("Ưu đãi — Teramont USA Limited")
+                .description("Phiên bản Limited cao cấp với gói ưu đãi đặc biệt dành cho khách hàng thành viên.")
+                .items(List.of(
+                    "Giảm 60 triệu tiền mặt",
+                    "Tặng bảo hiểm thân vỏ + nội thất 1 năm",
+                    "Phủ nano thân xe miễn phí",
+                    "Ưu đãi lãi suất 0% tối đa 18 tháng"
+                ))
+                .validUntil("30/06/2026")
+                .active(true));
+
+            promotionMap.put("teramont-president", CarPromotion.builder()
+                .title("Ưu đãi — Teramont President")
+                .description("Phiên bản đỉnh cao của Teramont với gói ưu đãi sang trọng đặc biệt.")
+                .items(List.of(
+                    "Giảm 80 triệu tiền mặt",
+                    "Tặng bảo hiểm toàn diện 1 năm",
+                    "Phủ nano & dán PPF miễn phí",
+                    "Tặng thẻ bảo dưỡng 3 năm"
+                ))
+                .validUntil("30/06/2026")
+                .active(true));
+
+            promotionMap.put("teramont-x-platinum", CarPromotion.builder()
+                .title("Ưu đãi — Teramont X Platinum")
+                .description("Phiên bản Platinum độc quyền với chương trình ưu đãi đặc biệt giới hạn.")
+                .items(List.of(
+                    "Giảm 70 triệu tiền mặt",
+                    "Tặng bảo hiểm thân vỏ + nội thất 1 năm",
+                    "Dán PPF toàn thân miễn phí",
+                    "Gói chăm sóc xe VIP 2 năm"
+                ))
+                .validUntil("30/06/2026")
+                .active(true));
+
+            promotionMap.put("viloran-premium", CarPromotion.builder()
+                .title("Ưu đãi — Viloran Premium")
+                .description("MPV 7 chỗ sang trọng với ưu đãi hấp dẫn cho gia đình hiện đại.")
+                .items(List.of(
+                    "Giảm 40 triệu tiền mặt",
+                    "Tặng bảo hiểm thân vỏ 1 năm",
+                    "Gói phụ kiện gia đình 8 triệu",
+                    "Hỗ trợ vay 0% lãi suất 12 tháng"
+                ))
+                .validUntil("30/06/2026")
+                .active(true));
+
+            promotionMap.put("viloran-luxury", CarPromotion.builder()
+                .title("Ưu đãi — Viloran Luxury")
+                .description("Trải nghiệm MPV hạng nhất với gói ưu đãi chăm sóc toàn diện.")
+                .items(List.of(
+                    "Giảm 60 triệu tiền mặt",
+                    "Tặng bảo hiểm toàn diện 1 năm",
+                    "Dán PPF kính + nóc xe",
+                    "Gói VIP: bảo dưỡng 3 năm miễn phí"
+                ))
+                .validUntil("30/06/2026")
+                .active(true));
+
+            promotionMap.put("golf-15-etsi", CarPromotion.builder()
+                .title("Ưu đãi — Golf 1.5 eTSI")
+                .description("Hatchback hybrid tiết kiệm với ưu đãi dành cho khách hàng trẻ năng động.")
+                .items(List.of(
+                    "Giảm 20 triệu tiền mặt",
+                    "Tặng bảo hiểm thân vỏ 1 năm",
+                    "Gói phụ kiện thể thao 5 triệu",
+                    "Hỗ trợ vay lãi suất 0% 6 tháng"
+                ))
+                .validUntil("30/06/2026")
+                .active(true));
+
+            promotionMap.put("golf-20", CarPromotion.builder()
+                .title("Ưu đãi — Golf 2.0 TSI")
+                .description("Hatchback hiệu suất cao với ưu đãi đặc biệt cho người yêu xe thể thao.")
+                .items(List.of(
+                    "Giảm 30 triệu tiền mặt",
+                    "Tặng bảo hiểm thân vỏ 1 năm",
+                    "Phủ nano thân xe miễn phí",
+                    "Hỗ trợ vay lãi suất ưu đãi"
+                ))
+                .validUntil("30/06/2026")
+                .active(true));
+
+            promotionMap.put("touareg-elegance", CarPromotion.builder()
+                .title("Ưu đãi — Touareg Elegance")
+                .description("SUV flagship đẳng cấp với chương trình ưu đãi dành riêng cho khách hàng VIP.")
+                .items(List.of(
+                    "Giảm 100 triệu tiền mặt",
+                    "Tặng bảo hiểm toàn diện 2 năm",
+                    "Dán PPF toàn thân cao cấp",
+                    "Gói bảo dưỡng VIP 3 năm miễn phí"
+                ))
+                .validUntil("30/06/2026")
+                .active(true));
+
+            promotionMap.put("touareg-rline", CarPromotion.builder()
+                .title("Ưu đãi — Touareg R-Line")
+                .description("Phiên bản thể thao của Touareg với ưu đãi hấp dẫn cho người yêu tốc độ.")
+                .items(List.of(
+                    "Giảm 100 triệu tiền mặt",
+                    "Tặng bảo hiểm toàn diện 1 năm",
+                    "Dán PPF + phủ nano toàn thân",
+                    "Ưu đãi đặc biệt khi mua trực tiếp showroom"
+                ))
+                .validUntil("30/06/2026")
+                .active(true));
+
+            promotionMap.put("touareg-highline", CarPromotion.builder()
+                .title("Ưu đãi — Touareg Highline")
+                .description("Đỉnh cao của Touareg với gói ưu đãi chăm sóc VIP toàn diện nhất.")
+                .items(List.of(
+                    "Giảm 120 triệu tiền mặt",
+                    "Tặng bảo hiểm toàn diện 2 năm",
+                    "Dán PPF toàn thân + phủ nano",
+                    "Thẻ VIP chăm sóc xe 3 năm miễn phí",
+                    "Tặng camera 360° chính hãng"
+                ))
+                .validUntil("30/06/2026")
+                .active(true));
+
+            List<CarPromotion> promotions = new ArrayList<>();
+            for (CarModel model : allModels) {
+                CarPromotion.CarPromotionBuilder builder = promotionMap.get(model.getSlug());
+                if (builder == null) {
+                    // Generic promotion for unknown slugs
+                    builder = CarPromotion.builder()
+                        .title("Ưu đãi đặc biệt — " + model.getName())
+                        .description("Cơ hội sở hữu " + model.getName() + " với ưu đãi hấp dẫn. Liên hệ ngay để nhận tư vấn chi tiết.")
+                        .items(List.of(
+                            "Ưu đãi giảm giá trực tiếp",
+                            "Tặng bảo hiểm thân vỏ 1 năm",
+                            "Hỗ trợ vay lãi suất ưu đãi"
+                        ))
+                        .validUntil("30/06/2026")
+                        .active(true);
+                }
+                promotions.add(builder.carModelId(model.getId()).build());
+            }
+            carPromotionRepository.saveAll(promotions);
+            log.info("Seeded {} car promotions", promotions.size());
         }
     }
 }

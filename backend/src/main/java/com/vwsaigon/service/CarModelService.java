@@ -19,15 +19,15 @@ public class CarModelService {
     private String uploadDir;
 
     public List<CarModel> getAll() {
-        return repository.findByActiveTrue();
+        return repository.findActiveOrdered();
     }
 
     public List<CarModel> getAllForAdmin() {
-        return repository.findAll();
+        return repository.findAllOrdered();
     }
 
     public List<CarModel> getFeatured() {
-        return repository.findByActiveTrueAndFeaturedTrue();
+        return repository.findFeaturedOrdered();
     }
 
     public CarModel getBySlug(String slug) {
@@ -57,6 +57,7 @@ public class CarModelService {
         existing.setTransmission(updated.getTransmission());
         existing.setImageUrl(updated.getImageUrl());
         existing.setVideoUrl(updated.getVideoUrl());
+        existing.setSortOrder(updated.getSortOrder());
         existing.setFeatured(updated.isFeatured());
         existing.setActive(updated.isActive());
         return repository.save(existing);

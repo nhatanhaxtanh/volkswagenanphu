@@ -48,6 +48,9 @@ public class CarModel {
     private List<String> images;
 
     @Builder.Default
+    private int sortOrder = 0;
+
+    @Builder.Default
     private boolean featured = false;
 
     @Builder.Default

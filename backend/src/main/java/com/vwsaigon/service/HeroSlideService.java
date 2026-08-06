@@ -19,11 +19,11 @@ public class HeroSlideService {
     private String uploadDir;
 
     public List<HeroSlide> getActive() {
-        return repository.findByActiveTrueOrderBySortOrderAsc();
+        return repository.findByActiveTrueOrderBySortOrderAscIdAsc();
     }
 
     public List<HeroSlide> getAll() {
-        return repository.findAllByOrderBySortOrderAsc();
+        return repository.findAllByOrderBySortOrderAscIdAsc();
     }
 
     public HeroSlide create(HeroSlide slide) {

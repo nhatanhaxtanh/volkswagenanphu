@@ -67,11 +67,7 @@ public class CarModelController {
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file,
             HttpServletRequest request) {
-        String scheme = request.getHeader("X-Forwarded-Proto") != null
-                ? request.getHeader("X-Forwarded-Proto") : request.getScheme();
-        String host = request.getHeader("Host") != null
-                ? request.getHeader("Host") : request.getServerName() + (request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "");
-        return ResponseEntity.ok(service.uploadThumbnail(id, file, scheme + "://" + host));
+        return ResponseEntity.ok(service.uploadThumbnail(id, file, baseUrl(request)));
     }
 
     @PostMapping("/api/admin/models/{id}/images")
@@ -79,12 +75,7 @@ public class CarModelController {
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file,
             HttpServletRequest request) {
-        String scheme = request.getHeader("X-Forwarded-Proto") != null
-                ? request.getHeader("X-Forwarded-Proto") : request.getScheme();
-        String host = request.getHeader("Host") != null
-                ? request.getHeader("Host") : request.getServerName() +
-                  (request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "");
-        return ResponseEntity.ok(service.addGalleryImage(id, file, scheme + "://" + host));
+        return ResponseEntity.ok(service.addGalleryImage(id, file, baseUrl(request)));
     }
 
     @DeleteMapping("/api/admin/models/{id}/images")
@@ -92,5 +83,30 @@ public class CarModelController {
             @PathVariable Long id,
             @RequestBody java.util.Map<String, String> body) {
         return ResponseEntity.ok(service.removeGalleryImage(id, body.get("url")));
+    }
+
+    @PostMapping("/api/admin/models/{id}/description-images")
+    public ResponseEntity<CarModel> addDescriptionImage(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "caption", required = false) String caption,
+            HttpServletRequest request) {
+        return ResponseEntity.ok(service.addDescriptionImage(id, file, caption, baseUrl(request)));
+    }
+
+    @DeleteMapping("/api/admin/models/{id}/description-images")
+    public ResponseEntity<CarModel> removeDescriptionImage(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, String> body) {
+        return ResponseEntity.ok(service.removeDescriptionImage(id, body.get("url")));
+    }
+
+    private String baseUrl(HttpServletRequest request) {
+        String scheme = request.getHeader("X-Forwarded-Proto") != null
+                ? request.getHeader("X-Forwarded-Proto") : request.getScheme();
+        String host = request.getHeader("Host") != null
+                ? request.getHeader("Host") : request.getServerName() +
+                  (request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "");
+        return scheme + "://" + host;
     }
 }

@@ -1,6 +1,7 @@
 package com.vwsaigon.service;
 
 import com.vwsaigon.entity.CarModel;
+import com.vwsaigon.entity.DescriptionImage;
 import com.vwsaigon.repository.CarModelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,6 +66,13 @@ public class CarModelService {
                     .filter(h -> h != null && h.getTitle() != null && !h.getTitle().isBlank())
                     .forEach(existing.getHighlights()::add);
         }
+        if (updated.getDescriptionImages() != null) {
+            if (existing.getDescriptionImages() == null) existing.setDescriptionImages(new java.util.ArrayList<>());
+            existing.getDescriptionImages().clear();
+            updated.getDescriptionImages().stream()
+                    .filter(img -> img != null && img.getImageUrl() != null && !img.getImageUrl().isBlank())
+                    .forEach(existing.getDescriptionImages()::add);
+        }
         existing.setSortOrder(updated.getSortOrder());
         existing.setFeatured(updated.isFeatured());
         existing.setActive(updated.isActive());
@@ -126,6 +134,38 @@ public class CarModelService {
         CarModel model = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Car model not found: " + id));
         if (model.getImages() != null) model.getImages().remove(imageUrl);
+        return repository.save(model);
+    }
+
+    public CarModel addDescriptionImage(Long id, MultipartFile file, String caption, String baseUrl) {
+        CarModel model = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Car model not found: " + id));
+        String original = file.getOriginalFilename() != null ? file.getOriginalFilename() : "image.jpg";
+        String ext = original.contains(".") ? original.substring(original.lastIndexOf('.')).toLowerCase() : ".jpg";
+        if (!java.util.List.of(".jpg", ".jpeg", ".png", ".webp").contains(ext))
+            throw new RuntimeException("Invalid file type");
+        if (file.getSize() > 2L * 1024 * 1024)
+            throw new RuntimeException("File size exceeds 2MB limit");
+        try {
+            java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir, "description");
+            java.nio.file.Files.createDirectories(uploadPath);
+            String filename = java.util.UUID.randomUUID() + ext;
+            java.nio.file.Files.copy(file.getInputStream(), uploadPath.resolve(filename), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            if (model.getDescriptionImages() == null) model.setDescriptionImages(new java.util.ArrayList<>());
+            model.getDescriptionImages().add(new DescriptionImage(
+                    baseUrl + "/api/uploads/description/" + filename,
+                    caption != null ? caption : ""));
+            return repository.save(model);
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Failed to store file", e);
+        }
+    }
+
+    public CarModel removeDescriptionImage(Long id, String imageUrl) {
+        CarModel model = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Car model not found: " + id));
+        if (model.getDescriptionImages() != null)
+            model.getDescriptionImages().removeIf(img -> img.getImageUrl() != null && img.getImageUrl().equals(imageUrl));
         return repository.save(model);
     }
 }

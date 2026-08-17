@@ -62,6 +62,13 @@ public class CarModel {
     @Builder.Default
     private List<CarHighlight> highlights = new ArrayList<>();
 
+    /** Ảnh chèn xen giữa các đoạn văn của phần "Giới thiệu". */
+    @ElementCollection
+    @CollectionTable(name = "car_model_description_images", joinColumns = @JoinColumn(name = "car_model_id"))
+    @OrderColumn(name = "position")
+    @Builder.Default
+    private List<DescriptionImage> descriptionImages = new ArrayList<>();
+
     @Builder.Default
     private int sortOrder = 0;
 

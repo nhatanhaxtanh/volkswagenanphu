@@ -47,6 +47,7 @@ public class CarModelService {
         existing.setCategory(updated.getCategory());
         existing.setPrice(updated.getPrice());
         existing.setPriceDisplay(updated.getPriceDisplay());
+        existing.setPriceEstimated(updated.isPriceEstimated());
         existing.setShortDescription(updated.getShortDescription());
         existing.setDescription(updated.getDescription());
         existing.setEngine(updated.getEngine());

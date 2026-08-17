@@ -28,6 +28,10 @@ public class CarModel {
     private Long price;
     private String priceDisplay;
 
+    /** Xe đã có mẫu nhưng chưa công bố giá chính thức — hiển thị nhãn "Giá dự kiến". */
+    @Builder.Default
+    private boolean priceEstimated = false;
+
     @Column(columnDefinition = "TEXT")
     private String shortDescription;
 

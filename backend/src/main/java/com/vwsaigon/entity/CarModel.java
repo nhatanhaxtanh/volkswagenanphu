@@ -28,7 +28,11 @@ public class CarModel {
     private Long price;
     private String priceDisplay;
 
-    /** Xe đã có mẫu nhưng chưa công bố giá chính thức — hiển thị nhãn "Giá dự kiến". */
+    /**
+     * Xe đã có mẫu nhưng chưa công bố giá chính thức — hiển thị nhãn "Giá dự kiến".
+     * columnDefinition có default để ALTER TABLE chạy được trên DB đã có sẵn dữ liệu.
+     */
+    @Column(columnDefinition = "boolean default false")
     @Builder.Default
     private boolean priceEstimated = false;
 

@@ -57,6 +57,13 @@ public class CarModelService {
         existing.setTransmission(updated.getTransmission());
         existing.setImageUrl(updated.getImageUrl());
         existing.setVideoUrl(updated.getVideoUrl());
+        if (updated.getHighlights() != null) {
+            if (existing.getHighlights() == null) existing.setHighlights(new java.util.ArrayList<>());
+            existing.getHighlights().clear();
+            updated.getHighlights().stream()
+                    .filter(h -> h != null && h.getTitle() != null && !h.getTitle().isBlank())
+                    .forEach(existing.getHighlights()::add);
+        }
         existing.setSortOrder(updated.getSortOrder());
         existing.setFeatured(updated.isFeatured());
         existing.setActive(updated.isActive());

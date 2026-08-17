@@ -3,6 +3,7 @@ package com.vwsaigon.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -46,6 +47,12 @@ public class CarModel {
     @CollectionTable(name = "car_model_images", joinColumns = @JoinColumn(name = "car_model_id"))
     @Column(name = "image_url")
     private List<String> images;
+
+    @ElementCollection
+    @CollectionTable(name = "car_model_highlights", joinColumns = @JoinColumn(name = "car_model_id"))
+    @OrderColumn(name = "position")
+    @Builder.Default
+    private List<CarHighlight> highlights = new ArrayList<>();
 
     @Builder.Default
     private int sortOrder = 0;

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +26,12 @@ public class CarModelController {
     @GetMapping("/api/models/featured")
     public List<CarModel> getFeatured() {
         return service.getFeatured();
+    }
+
+    /** Số lượt đăng ký lái thử theo dòng xe: { modelId: count }. */
+    @GetMapping("/api/models/interest-counts")
+    public Map<Long, Long> getInterestCounts() {
+        return service.getInterestCounts();
     }
 
     @GetMapping("/api/models/{slug}")

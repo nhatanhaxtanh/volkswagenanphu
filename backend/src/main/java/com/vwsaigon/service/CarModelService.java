@@ -3,18 +3,22 @@ package com.vwsaigon.service;
 import com.vwsaigon.entity.CarModel;
 import com.vwsaigon.entity.DescriptionImage;
 import com.vwsaigon.repository.CarModelRepository;
+import com.vwsaigon.repository.TestDriveRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class CarModelService {
 
     private final CarModelRepository repository;
+    private final TestDriveRepository testDriveRepository;
 
     @Value("${app.upload.dir:./uploads}")
     private String uploadDir;
@@ -34,6 +38,19 @@ public class CarModelService {
     public CarModel getBySlug(String slug) {
         return repository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Car model not found: " + slug));
+    }
+
+    /**
+     * Số lượt khách đăng ký lái thử theo từng dòng xe, dùng làm tín hiệu quan tâm
+     * hiển thị ngoài trang công khai. Dòng xe chưa có đơn nào thì không có mặt
+     * trong map (phía frontend tự ẩn thay vì hiện số 0).
+     */
+    public Map<Long, Long> getInterestCounts() {
+        Map<Long, Long> counts = new HashMap<>();
+        for (Object[] row : testDriveRepository.countGroupedByModelId()) {
+            counts.put((Long) row[0], (Long) row[1]);
+        }
+        return counts;
     }
 
     public CarModel create(CarModel model) {

@@ -26,9 +26,9 @@ Knguyen/
 ## Bước 2: Clone và cấu hình
 
 ```bash
-# Trên VPS
-git clone <your-repo> vwsaigon
-cd vwsaigon
+# Trên VPS (thư mục production hiện tại: ~/volkswagenanphu)
+git clone <your-repo> volkswagenanphu
+cd volkswagenanphu
 
 # Tạo file .env từ template
 cp .env.example .env
@@ -64,22 +64,62 @@ docker compose ps
 - **Admin**: `http://your-vps-ip/admin/login`
 - **API**: `http://your-vps-ip/api/models`
 
-## Cấu hình domain + HTTPS (tùy chọn)
+## Cấu hình domain + HTTPS
+
+> ⚠️ **Không dùng `certbot --standalone`.** Standalone tự bind port 80, nhưng
+> port đó do container `vw_nginx` giữ, nên mọi lần auto-renew sẽ fail âm thầm và
+> cert hết hạn sau 90 ngày. Dùng webroot như dưới đây — renew không đụng port 80.
 
 ```bash
 # Cài Certbot
 apt install certbot
 
-# Lấy SSL certificate
-certbot certonly --standalone -d yourdomain.com
+# Thư mục chứa ACME challenge (đã mount vào vw_nginx qua docker-compose.yml)
+mkdir -p /var/www/certbot
+docker compose up -d nginx
 
-# Copy certificates
-mkdir -p nginx/ssl
-cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem nginx/ssl/
-cp /etc/letsencrypt/live/yourdomain.com/privkey.pem nginx/ssl/
+# Lấy SSL certificate
+certbot certonly --webroot -w /var/www/certbot \
+  --cert-name yourdomain.com \
+  -d yourdomain.com -d www.yourdomain.com
 ```
 
-Sau đó cập nhật `nginx/nginx.conf` để dùng HTTPS.
+`nginx/nginx.conf` đã có sẵn `location /.well-known/acme-challenge/` trong
+server block port 80 để phục vụ challenge. Không xoá location đó.
+
+Cert nằm ở `/etc/letsencrypt/live/<domain>/`, được mount thẳng vào container —
+không cần copy vào `nginx/ssl/`.
+
+### Deploy hook (bắt buộc)
+
+nginx chỉ đọc cert lúc khởi động. Certbot renew thành công nhưng không reload thì
+nginx vẫn phục vụ cert cũ cho tới khi hết hạn:
+
+```bash
+cat > /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh <<'EOF'
+#!/bin/sh
+docker exec vw_nginx nginx -s reload
+EOF
+chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+```
+
+### Kiểm tra auto-renew
+
+```bash
+certbot renew --dry-run              # phải báo success
+systemctl list-timers | grep certbot # phải thấy certbot.timer
+```
+
+`--dry-run` success là bằng chứng duy nhất cho biết cert sẽ tự gia hạn.
+
+### Lưu ý: không cài nginx trên host
+
+VPS chỉ được có một nginx là container `vw_nginx`. Nếu nginx host chạy, nó sẽ
+chiếm port 80/443 và phục vụ trang "Welcome to nginx!" thay cho website:
+
+```bash
+systemctl mask nginx   # chặn nginx host khởi động dưới mọi hình thức
+```
 
 ## Quản lý
 

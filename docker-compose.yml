@@ -33,8 +33,11 @@ services:
     volumes:
       - uploads_data:/app/uploads
     networks:
-      - vw_network
-      - edge
+      vw_network:
+        # Tomcat trả 400 nếu Host header có "_" (vw_backend), nên frontend gọi qua alias này
+        aliases:
+          - vw-backend
+      edge:
 
   frontend:
     build: ./frontend
@@ -44,7 +47,7 @@ services:
       - backend
     environment:
       NEXT_PUBLIC_API_URL: /api
-      BACKEND_URL: http://vw_backend:8080
+      BACKEND_URL: http://vw-backend:8080
     networks:
       - vw_network
       - edge

@@ -1,3 +1,5 @@
+# VW không giữ cổng 80/443: proxy là edge_caddy ở /root/edge (domain khai báo trong /root/edge/Caddyfile).
+# Gọi nhau bằng tên container (vw_*) vì frontend/backend ở chung network "edge" với dự án khác.
 services:
   postgres:
     image: postgres:16-alpine
@@ -19,7 +21,7 @@ services:
     depends_on:
       - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/vwsaigon
+      SPRING_DATASOURCE_URL: jdbc:postgresql://vw_postgres:5432/vwsaigon
       SPRING_DATASOURCE_USERNAME: vwsaigon
       SPRING_DATASOURCE_PASSWORD: vwsaigon_password
       APP_JWT_SECRET: ${JWT_SECRET:-vwsaigon-change-this-secret-in-production-32chars}
@@ -32,6 +34,7 @@ services:
       - uploads_data:/app/uploads
     networks:
       - vw_network
+      - edge
 
   frontend:
     build: ./frontend
@@ -41,26 +44,10 @@ services:
       - backend
     environment:
       NEXT_PUBLIC_API_URL: /api
-      BACKEND_URL: http://backend:8080
+      BACKEND_URL: http://vw_backend:8080
     networks:
       - vw_network
-
-  nginx:
-    image: nginx:alpine
-    container_name: vw_nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-      - /var/www/certbot:/var/www/certbot:ro
-    depends_on:
-      - frontend
-      - backend
-    networks:
-      - vw_network
+      - edge
 
 volumes:
   postgres_data:
@@ -69,3 +56,8 @@ volumes:
 networks:
   vw_network:
     driver: bridge
+  # Network dùng chung với proxy Caddy (stack /root/edge, repo hppmweb deploy/edge).
+  # Caddy giữ 80/443 và gọi vw_frontend/vw_backend qua network này.
+  edge:
+    external: true
+    name: edge

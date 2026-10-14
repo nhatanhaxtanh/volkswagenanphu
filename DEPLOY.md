@@ -6,7 +6,7 @@
 Knguyen/
 ├── frontend/          # Next.js 16 (React, shadcn/ui, Framer Motion)
 ├── backend/           # Spring Boot 3.4 (PostgreSQL, JWT, Gmail SMTP)
-├── nginx/             # Reverse proxy config
+├── nginx/             # Cấu hình nginx CŨ, không còn dùng (giữ để quay về khi cần)
 ├── docker-compose.yml
 └── .env.example       # Biến môi trường mẫu
 ```
@@ -14,7 +14,7 @@ Knguyen/
 ## Yêu cầu VPS
 
 - Docker + Docker Compose
-- Mở port 80 (và 443 nếu dùng HTTPS)
+- Stack proxy `edge` (Caddy) đang chạy ở `/root/edge` và network `edge` đã tạo (xem mục Domain + HTTPS)
 - Ít nhất 2GB RAM
 
 ## Bước 1: Cấu hình Gmail App Password
@@ -60,66 +60,33 @@ docker compose ps
 
 ## Bước 4: Kiểm tra
 
-- **Website**: `http://your-vps-ip`
-- **Admin**: `http://your-vps-ip/admin/login`
-- **API**: `http://your-vps-ip/api/models`
+- **Website**: `https://volkswagenanphu.vn`
+- **Admin**: `https://volkswagenanphu.vn/admin/login`
+- **API**: `https://volkswagenanphu.vn/api/models`
 
-## Cấu hình domain + HTTPS
+## Domain + HTTPS (proxy chung Caddy)
 
-> ⚠️ **Không dùng `certbot --standalone`.** Standalone tự bind port 80, nhưng
-> port đó do container `vw_nginx` giữ, nên mọi lần auto-renew sẽ fail âm thầm và
-> cert hết hạn sau 90 ngày. Dùng webroot như dưới đây — renew không đụng port 80.
+VPS chạy chung VW và HPPM. **VW không giữ cổng 80/443.** Cổng 80/443 do container
+`edge_caddy` (stack `/root/edge`, không thuộc dự án nào) giữ; Caddy tự cấp và gia hạn
+Let's Encrypt, tự chuyển http → https. Bản gốc của `Caddyfile` nằm trong repo HPPM
+(`github.com/nhatanhaxtanh/hppmweb`, `deploy/edge/Caddyfile`), bản trên VPS phải giống bản đó.
 
-```bash
-# Cài Certbot
-apt install certbot
-
-# Thư mục chứa ACME challenge (đã mount vào vw_nginx qua docker-compose.yml)
-mkdir -p /var/www/certbot
-docker compose up -d nginx
-
-# Lấy SSL certificate
-certbot certonly --webroot -w /var/www/certbot \
-  --cert-name yourdomain.com \
-  -d yourdomain.com -d www.yourdomain.com
+```
+Internet ──80/443──> edge_caddy ──(network edge)──> vw_frontend:3000 / vw_backend:8080 (/api/*)
+                                        └─────────> hppm-backend
 ```
 
-`nginx/nginx.conf` đã có sẵn `location /.well-known/acme-challenge/` trong
-server block port 80 để phục vụ challenge. Không xoá location đó.
-
-Cert nằm ở `/etc/letsencrypt/live/<domain>/`, được mount thẳng vào container —
-không cần copy vào `nginx/ssl/`.
-
-### Deploy hook (bắt buộc)
-
-nginx chỉ đọc cert lúc khởi động. Certbot renew thành công nhưng không reload thì
-nginx vẫn phục vụ cert cũ cho tới khi hết hạn:
-
-```bash
-cat > /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh <<'EOF'
-#!/bin/sh
-docker exec vw_nginx nginx -s reload
-EOF
-chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
-```
-
-### Kiểm tra auto-renew
-
-```bash
-certbot renew --dry-run              # phải báo success
-systemctl list-timers | grep certbot # phải thấy certbot.timer
-```
-
-`--dry-run` success là bằng chứng duy nhất cho biết cert sẽ tự gia hạn.
-
-### Lưu ý: không cài nginx trên host
-
-VPS chỉ được có một nginx là container `vw_nginx`. Nếu nginx host chạy, nó sẽ
-chiếm port 80/443 và phục vụ trang "Welcome to nginx!" thay cho website:
-
-```bash
-systemctl mask nginx   # chặn nginx host khởi động dưới mọi hình thức
-```
+- `vw_frontend`, `vw_backend` tham gia network `edge` (`external: true`); `vw_postgres` chỉ ở `vw_network`.
+- Domain VW (`volkswagenanphu.vn`, `www` → redirect về apex) khai báo trong `/root/edge/Caddyfile`.
+  Đổi domain/route thì sửa file đó (dùng `nano`, không dùng `vim`) rồi:
+  ```bash
+  cd /root/edge
+  docker compose exec caddy caddy validate --config /etc/caddy/Caddyfile
+  docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
+  ```
+- ⚠️ **Không bao giờ dừng stack `/root/edge`** khi deploy VW, và không thêm `ports: 80/443` vào compose VW.
+  `docker compose down/up` ở `/root/volkswagenanphu` chỉ ảnh hưởng VW.
+- Không cần certbot cho VW nữa. Không cài nginx trên host (`systemctl mask nginx`).
 
 ## Quản lý
 

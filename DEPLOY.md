@@ -60,9 +60,9 @@ docker compose ps
 
 ## Bước 4: Kiểm tra
 
-- **Website**: `https://volkswagenanphu.vn`
-- **Admin**: `https://volkswagenanphu.vn/admin/login`
-- **API**: `https://volkswagenanphu.vn/api/models`
+- **Website**: `https://volkswagenflagship.vn`
+- **Admin**: `https://volkswagenflagship.vn/admin/login`
+- **API**: `https://volkswagenflagship.vn/api/models`
 
 ## Domain + HTTPS (proxy chung Caddy)
 
@@ -77,7 +77,7 @@ Internet ──80/443──> edge_caddy ──(network edge)──> vw_frontend:
 ```
 
 - `vw_frontend`, `vw_backend` tham gia network `edge` (`external: true`); `vw_postgres` chỉ ở `vw_network`.
-- Domain VW (`volkswagenanphu.vn`, `www` → redirect về apex) khai báo trong `/root/edge/Caddyfile`.
+- Domain VW (`volkswagenflagship.vn`; `www` và domain cũ `volkswagenanphu.vn` → redirect 301 về đó) khai báo trong `/root/edge/Caddyfile`.
   Đổi domain/route thì sửa file đó (dùng `nano`, không dùng `vim`) rồi:
   ```bash
   cd /root/edge
@@ -87,6 +87,33 @@ Internet ──80/443──> edge_caddy ──(network edge)──> vw_frontend:
 - ⚠️ **Không bao giờ dừng stack `/root/edge`** khi deploy VW, và không thêm `ports: 80/443` vào compose VW.
   `docker compose down/up` ở `/root/volkswagenanphu` chỉ ảnh hưởng VW.
 - Không cần certbot cho VW nữa. Không cài nginx trên host (`systemctl mask nginx`).
+
+## Đổi tên miền
+
+Thứ tự: DNS → code (frontend `src/lib/site.ts` + `next.config.ts`, backend `app.site-url`) → Caddyfile → deploy → DB.
+
+1. Bản ghi `A` cho `@` và `www` trỏ về `103.200.20.69`; `dig +short <domain>` ra đúng IP mới làm tiếp.
+2. Sửa Caddyfile (repo HPPM và `/root/edge`), validate, reload. Kiểm tra `curl -I https://<domain>` ra 200.
+3. `git pull`, `git -C frontend pull`, `docker compose up -d --build`.
+4. Ảnh upload lưu URL tuyệt đối trong DB, đổi sang domain mới (backup trước). Sửa `OLD`/`NEW` cho đúng:
+
+```bash
+docker exec vw_postgres pg_dump -U vwsaigon vwsaigon > backup-$(date +%F).sql
+docker exec -i vw_postgres psql -U vwsaigon vwsaigon -v ON_ERROR_STOP=1 <<'SQL'
+\set OLD '^https?://(www\\.)?volkswagenanphu\\.vn'
+\set NEW 'https://volkswagenflagship.vn'
+BEGIN;
+UPDATE car_models SET image_url = regexp_replace(image_url, :'OLD', :'NEW'), video_url = regexp_replace(video_url, :'OLD', :'NEW');
+UPDATE car_model_images SET image_url = regexp_replace(image_url, :'OLD', :'NEW');
+UPDATE car_model_description_images SET image_url = regexp_replace(image_url, :'OLD', :'NEW');
+UPDATE hero_slides SET image_url = regexp_replace(image_url, :'OLD', :'NEW'), video_url = regexp_replace(video_url, :'OLD', :'NEW');
+UPDATE news_posts SET image_url = regexp_replace(image_url, :'OLD', :'NEW');
+UPDATE handover_photos SET image_url = regexp_replace(image_url, :'OLD', :'NEW');
+COMMIT;
+SQL
+```
+
+Giữ domain cũ trong Caddyfile (redirect) và `next.config.ts` ít nhất vài tháng cho Google cập nhật.
 
 ## Quản lý
 
@@ -121,9 +148,9 @@ npm run dev   # chạy tại http://localhost:3000
 # Chạy PostgreSQL local (cần Docker)
 docker run -d -p 5432:5432 -e POSTGRES_DB=vwsaigon -e POSTGRES_USER=vwsaigon -e POSTGRES_PASSWORD=vwsaigon_password postgres:16-alpine
 
-# Điền thông tin Gmail vào application.properties
+# Truyền mật khẩu Gmail qua biến môi trường (không ghi vào application.properties)
 cd backend
-./mvnw spring-boot:run   # chạy tại http://localhost:8080
+SPRING_MAIL_PASSWORD='xxxx xxxx xxxx xxxx' ./mvnw spring-boot:run   # chạy tại http://localhost:8080
 ```
 
 ## Tài khoản admin mặc định

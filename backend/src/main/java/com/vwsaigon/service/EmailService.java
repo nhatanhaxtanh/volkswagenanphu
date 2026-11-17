@@ -22,6 +22,9 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
+    @Value("${app.site-url}")
+    private String siteUrl;
+
     @Async
     public void sendContactNotification(String fullName, String phone, String email, String message) {
         try {
@@ -112,7 +115,7 @@ public class EmailService {
                           <td style="padding: 8px 0;">%s</td></tr>
                     </table>
                     <div style="margin-top: 24px; text-align: center;">
-                      <a href="http://localhost:3000/admin/test-drives" style="background: #000; color: #fff; padding: 12px 24px; text-decoration: none; font-size: 13px; letter-spacing: 1px;">XEM TRONG TRANG QUẢN TRỊ</a>
+                      <a href="%s/admin/test-drives" style="background: #000; color: #fff; padding: 12px 24px; text-decoration: none; font-size: 13px; letter-spacing: 1px;">XEM TRONG TRANG QUẢN TRỊ</a>
                     </div>
                   </div>
                 </div>
@@ -122,7 +125,8 @@ public class EmailService {
                 r.getModelName() != null ? r.getModelName() : "Chưa chọn",
                 r.getPreferredDate() != null && !r.getPreferredDate().isBlank() ? r.getPreferredDate() : "Chuyên viên xác nhận",
                 r.getPreferredTime() != null && !r.getPreferredTime().isBlank() ? r.getPreferredTime() : "—",
-                r.getNotes() != null && !r.getNotes().isBlank() ? r.getNotes() : "—"
+                r.getNotes() != null && !r.getNotes().isBlank() ? r.getNotes() : "—",
+                siteUrl
         );
     }
 

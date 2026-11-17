@@ -1,4 +1,4 @@
-# Volkswagen An Phú (volkswagenanphu.vn)
+# Volkswagen An Phú (volkswagenflagship.vn)
 
 Website đại lý Volkswagen An Phú: trang giới thiệu xe, tin tức, đăng ký lái thử/liên hệ (gửi email),
 trang quản trị `/admin`.
@@ -24,10 +24,10 @@ VPS `103.200.20.69` chạy chung 2 dự án: **VW** (`/root/volkswagenanphu`) v�
 chỉ backend + Postgres).
 
 ```
-Internet ──80/443──> edge_caddy ──(network edge)──> vw_frontend:3000   (volkswagenanphu.vn/*)
-                                        ├─────────> vw_backend:8080    (volkswagenanphu.vn/api/*, giữ prefix /api)
+Internet ──80/443──> edge_caddy ──(network edge)──> vw_frontend:3000   (volkswagenflagship.vn/*)
+                                        ├─────────> vw_backend:8080    (volkswagenflagship.vn/api/*, giữ prefix /api)
                                         └─────────> hppm-backend:8080  (api.hppm.vn)
-www.volkswagenanphu.vn ──301──> volkswagenanphu.vn
+www.volkswagenflagship.vn, volkswagenanphu.vn, www.volkswagenanphu.vn ──301──> volkswagenflagship.vn
 ```
 
 - Cổng 80/443 do **Caddy** (`edge_caddy`, stack `/root/edge`) giữ, không thuộc dự án nào. Caddy tự cấp/gia hạn
@@ -76,6 +76,10 @@ curl https://api.hppm.vn/actuator/health
 # Backup database
 docker exec vw_postgres pg_dump -U vwsaigon vwsaigon > backup.sql
 ```
+
+Domain còn ghi ở: frontend `src/lib/site.ts` (`SITE_URL`) và `next.config.ts` (`remotePatterns`), backend
+`app.site-url` (link trong email). Ảnh upload lưu URL tuyệt đối trong DB (lấy từ Host của request):
+đổi domain thì phải cập nhật DB, xem mục "Đổi tên miền" trong `DEPLOY.md`.
 
 Tắt hẳn domain VW (không trả gì, kể cả 502): comment 2 khối VW trong `/root/edge/Caddyfile`, reload Caddy.
 

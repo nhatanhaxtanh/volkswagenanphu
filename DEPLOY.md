@@ -4,7 +4,7 @@
 
 ```
 Knguyen/
-├── frontend/          # Next.js 16 (React, shadcn/ui, Framer Motion)
+├── frontend/          # Next.js 16, repo riêng: git clone https://github.com/nhatanhaxtanh/frontend.git frontend
 ├── backend/           # Spring Boot 3.4 (PostgreSQL, JWT, Gmail SMTP)
 ├── nginx/             # Cấu hình nginx CŨ, không còn dùng (giữ để quay về khi cần)
 ├── docker-compose.yml
@@ -97,8 +97,9 @@ docker compose logs backend -f
 # Restart một service
 docker compose restart backend
 
-# Update code
+# Update code (frontend là repo riêng, pull riêng)
 git pull
+git -C frontend pull
 docker compose up -d --build
 
 # Backup database

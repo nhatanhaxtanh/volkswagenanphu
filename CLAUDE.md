@@ -11,8 +11,9 @@ trang quản trị `/admin`.
   - Ảnh upload lưu ở `/app/uploads` (volume `uploads_data`), phục vụ qua `/api/uploads/**`.
   - Upload tối đa 2MB/ảnh (`spring.servlet.multipart.*` trong `application.properties`).
   - Dockerfile dùng image `maven:3.9-eclipse-temurin-21`, **không** `apk add maven` (từng treo 30+ phút trên VPS).
-- `frontend/`: Next.js 16. **Không nằm trong git**: chỉ có trên VPS (`/root/volkswagenanphu/frontend`,
-  untracked). Gọi backend phía server qua `BACKEND_URL`, phía trình duyệt qua `/api`.
+- `frontend/`: Next.js 16. **Repo riêng** `github.com/nhatanhaxtanh/frontend`, clone vào `./frontend`
+  (repo này ignore `frontend/`; commit/push frontend trong thư mục đó). Gọi backend phía server qua
+  `BACKEND_URL`, phía trình duyệt qua `/api`. Repo `volkswagen-saigon` là bản nháp cũ, không dùng.
 - `nginx/`: cấu hình nginx **cũ, không còn dùng**, giữ để quay về khi cần.
 - `docker-compose.yml`: `vw_postgres`, `vw_backend`, `vw_frontend`. Không có proxy, không mở cổng 80/443.
 - `DEPLOY.md`: hướng dẫn deploy chi tiết.
@@ -53,7 +54,7 @@ www.volkswagenanphu.vn ──301──> volkswagenanphu.vn
 ```bash
 # Deploy VW
 cd /root/volkswagenanphu
-git pull && docker compose config -q
+git pull && git -C frontend pull && docker compose config -q
 docker compose up -d --build --remove-orphans
 
 # Tắt / bật tạm VW (Caddy trả 502 cho domain VW, HPPM không ảnh hưởng)
@@ -82,4 +83,6 @@ Tắt hẳn domain VW (không trả gì, kể cả 502): comment 2 khối VW tro
 
 - Khi web chạy ổn vài ngày: xoá `/etc/letsencrypt/renewal-hooks/deploy/reload-vw-nginx.sh`,
   `systemctl disable --now certbot.timer` (nếu không còn ai dùng certbot). Giữ `/etc/letsencrypt` một thời gian.
+- Kiểm tra `/root/volkswagenanphu/frontend` trên VPS có phải clone của `nhatanhaxtanh/frontend` không
+  (`git -C frontend remote -v`, `git -C frontend status`). Nếu không: đẩy thay đổi lên repo rồi thay bằng bản clone.
 - Trên VPS còn file sửa tay chưa commit: `nginx/nginx.conf` (thêm block `api.hppm.vn`, không còn dùng) và các file `.bak`.

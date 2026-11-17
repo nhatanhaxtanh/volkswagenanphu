@@ -87,6 +87,9 @@ Tắt hẳn domain VW (không trả gì, kể cả 502): comment 2 khối VW tro
 
 - Khi web chạy ổn vài ngày: xoá `/etc/letsencrypt/renewal-hooks/deploy/reload-vw-nginx.sh`,
   `systemctl disable --now certbot.timer` (nếu không còn ai dùng certbot). Giữ `/etc/letsencrypt` một thời gian.
-- Kiểm tra `/root/volkswagenanphu/frontend` trên VPS có phải clone của `nhatanhaxtanh/frontend` không
-  (`git -C frontend remote -v`, `git -C frontend status`). Nếu không: đẩy thay đổi lên repo rồi thay bằng bản clone.
+- 17/11/2026 đã chuyển domain sang `volkswagenflagship.vn` (Caddy, code, URL ảnh trong DB). Giữ redirect
+  `volkswagenanphu.vn` và mục đó trong `next.config.ts` ít nhất đến 05/2027; khai báo "Thay đổi địa chỉ"
+  trong Google Search Console.
+- Thu hồi app password Gmail cũ (đã lộ trong lịch sử git), đặt mật khẩu mới vào `GMAIL_APP_PASSWORD` trong `.env`.
+  Kiểm tra `.env` trên VPS có `JWT_SECRET` riêng (nếu không, backend dùng secret mặc định công khai trong compose).
 - Trên VPS còn file sửa tay chưa commit: `nginx/nginx.conf` (thêm block `api.hppm.vn`, không còn dùng) và các file `.bak`.
